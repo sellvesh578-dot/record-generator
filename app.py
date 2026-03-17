@@ -6,9 +6,6 @@ app = Flask(__name__)
 
 TEMPLATE = "template.pdf"
 
-# your secret password
-ADMIN_PASSWORD = "sellvesh123"
-
 slots = {
     9: "output1.pdf",
     13: "output2.pdf",
@@ -26,11 +23,11 @@ os.makedirs("final", exist_ok=True)
 def home():
     return '''
     <h1>Record Generator</h1>
-    <h3>Upload Outputs</h3>
+    <h3>Developed by SELLVESH</h3>
 
     <form method="POST" action="/generate" enctype="multipart/form-data">
 
-    Student Name: <input type="text" name="name"><br><br>
+    Student Name: <input type="text" name="name" required><br><br>
 
     Output1: <input type="file" name="output1"><br><br>
     Output2: <input type="file" name="output2"><br><br>
@@ -39,7 +36,7 @@ def home():
     Output5: <input type="file" name="output5"><br><br>
     Output6: <input type="file" name="output6"><br><br>
 
-    <input type="submit" value="Upload Outputs">
+    <input type="submit" value="Generate Record">
 
     </form>
     '''
@@ -82,15 +79,16 @@ def generate():
     with open(final_file, "wb") as f:
         writer.write(f)
 
-    return "<h2>Upload Successful</h2>"
+    return f'''
+    <h2>Record Generated Successfully!</h2>
+    <a href="/download/{name}">
+    <button style="font-size:20px;padding:10px;">Download PDF</button>
+    </a>
+    '''
 
 
-# secret download page
-@app.route("/admin_download/<password>/<name>")
-def download(password, name):
-
-    if password != ADMIN_PASSWORD:
-        return "Access Denied"
+@app.route("/download/<name>")
+def download(name):
 
     file_path = f"final/{name}.pdf"
 
