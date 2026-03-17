@@ -6,6 +6,9 @@ app = Flask(__name__)
 
 TEMPLATE = "template.pdf"
 
+# your secret password
+ADMIN_PASSWORD = "sellvesh123"
+
 slots = {
     9: "output1.pdf",
     13: "output2.pdf",
@@ -18,15 +21,16 @@ slots = {
 os.makedirs("outputs", exist_ok=True)
 os.makedirs("final", exist_ok=True)
 
+
 @app.route("/")
 def home():
     return '''
     <h1>Record Generator</h1>
-    <h3>Developed by SELLVESH</h3>
+    <h3>Upload Outputs</h3>
 
     <form method="POST" action="/generate" enctype="multipart/form-data">
 
-    Student Name: <input type="text" name="name" required><br><br>
+    Student Name: <input type="text" name="name"><br><br>
 
     Output1: <input type="file" name="output1"><br><br>
     Output2: <input type="file" name="output2"><br><br>
@@ -40,6 +44,7 @@ def home():
     </form>
     '''
 
+
 @app.route("/generate", methods=["POST"])
 def generate():
 
@@ -48,13 +53,15 @@ def generate():
     template = PdfReader(TEMPLATE)
     writer = PdfWriter()
 
+    # save uploaded outputs
     for key in request.files:
         file = request.files[key]
 
-        if file and file.filename != "":
+        if file.filename != "":
             path = f"outputs/{key}.pdf"
             file.save(path)
 
+    # merge template + outputs
     for i, page in enumerate(template.pages, start=1):
 
         writer.add_page(page)
@@ -75,10 +82,15 @@ def generate():
     with open(final_file, "wb") as f:
         writer.write(f)
 
-    return "<h2>Upload Successful! Record will be prepared by SELLVESH.</h2>"
+    return "<h2>Upload Successful</h2>"
 
-@app.route("/sellvesh_download/<name>")
-def download(name):
+
+# secret download page
+@app.route("/admin_download/<password>/<name>")
+def download(password, name):
+
+    if password != ADMIN_PASSWORD:
+        return "Access Denied"
 
     file_path = f"final/{name}.pdf"
 
@@ -86,6 +98,7 @@ def download(name):
         return send_file(file_path)
 
     return "File not found"
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
