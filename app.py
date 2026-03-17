@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 TEMPLATE = "template.pdf"
-PASSWORD = "SELL@2209"
+PASSWORD = "SELL@220905"
 
 slots = {
     9: "output1.pdf",
