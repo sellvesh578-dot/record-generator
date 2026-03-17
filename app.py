@@ -66,7 +66,7 @@ def generate():
 
         if i in slots:
 
-            path = f"uploads/{name}_" + slots[i]
+            path = f"uploads/{name}_{slots[i]}"
 
             if os.path.exists(path):
 
@@ -75,13 +75,23 @@ def generate():
                 for p in output_pdf.pages:
                     writer.add_page(p)
 
-    # encrypt PDF
-    writer.encrypt(PASSWORD)
-
+    # create final file
     final_file = f"final/{name}.pdf"
 
     with open(final_file, "wb") as f:
         writer.write(f)
+
+    # now encrypt PDF
+    reader = PdfReader(final_file)
+    secure_writer = PdfWriter()
+
+    for page in reader.pages:
+        secure_writer.add_page(page)
+
+    secure_writer.encrypt(PASSWORD)
+
+    with open(final_file, "wb") as f:
+        secure_writer.write(f)
 
     return f'''
     <h2>Record Generated Successfully!</h2>
@@ -100,7 +110,7 @@ def download(name):
     file_path = f"final/{name}.pdf"
 
     if os.path.exists(file_path):
-        return send_file(file_path)
+        return send_file(file_path, as_attachment=True)
 
     return "File not ready yet"
 
