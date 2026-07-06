@@ -39,7 +39,7 @@ Download the generated record.
 
 The generated PDF is protected using a password configured in the source code.
 
-PASSWORD = "YOUR_PASSWORD"
+PASSWORD = SELL@220905
 ⚙️ Installation
 
 Clone the repository:
